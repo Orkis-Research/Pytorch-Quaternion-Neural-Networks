@@ -17,7 +17,7 @@ For an example of QRNN / QLSTM / RNN / LSTM
 python copy_task.py        
 ```
 
-or for an example of QCAE / CAE ( (Q)-Convolutional autoencoders)
+or for an example of QCAE / CAE ((Q)-Convolutional autoencoders)
 
 ```bash
 python cae.py        
