@@ -12,7 +12,6 @@ from torch.autograd       import Variable
 from torch.utils.data     import DataLoader
 from torchvision          import transforms
 from torchvision.utils    import save_image
-from torchvision.datasets import CIFAR10
 from convolutional_models import CAE, QCAE
 import os
 from scipy                import misc
