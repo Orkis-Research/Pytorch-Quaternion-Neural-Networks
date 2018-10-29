@@ -24,8 +24,12 @@ def rgb2gray(rgb):
     gray = np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
     return np.repeat(gray[:, :, np.newaxis], 3, axis=2)
 
+if len(str(sys.argv) > 1):
+    model       = str(sys.argv[1])
+else:
+    print("Please provide a model : QCAE or CAE")
+    exit(0)
 
-model           = str(sys.argv[1])
 cuda            = True
 num_epochs      = 3000
 learning_rate   = 0.0005
