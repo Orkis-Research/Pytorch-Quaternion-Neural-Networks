@@ -46,7 +46,7 @@ if cuda:
 #
 # MANAGING PICTURES
 #
-
+os.system('mkdir -p RES')
 os.system('rm -rf RES/test_image*')
 train = rgb2gray(misc.imread('KODAK/kodim05.png'))
 test  = misc.imread('KODAK/kodim23.png')
