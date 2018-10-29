@@ -11,19 +11,14 @@ pip install torch torchvision matplotlib
 
 Usage
 ------------
+For an example of QRNN / QLSTM / RNN / LSTM
 
 ```bash
 python copy_task.py        
 ```
 
-or
+or for an example of QCAE / CAE ( (Q)-Convolutional autoencoders)
 
 ```bash
-python cnn_mnist.py        
-```
-
-or
-
-```bash
-python cae_kodak.py        
+python cae.py        
 ```
