@@ -24,19 +24,19 @@ first  = 10
 second = 50
 third  = 100
 
-q_acc_f  = np.loadtxt("DATA/memory_task_acc_q_"+str(first)+".txt")
-q_loss_f = np.loadtxt("DATA/memory_task_loss_q_"+str(first)+".txt")
-q_acc_s  = np.loadtxt("DATA/memory_task_acc_q_"+str(second)+".txt")
-q_loss_s = np.loadtxt("DATA/memory_task_loss_q_"+str(second)+".txt")
-q_acc_t  = np.loadtxt("DATA/memory_task_acc_q_"+str(third)+".txt")
-q_loss_t = np.loadtxt("DATA/memory_task_loss_q_"+str(third)+".txt")
+q_acc_f  = np.loadtxt("../RES/memory_task_acc_q_"+str(first)+".txt")
+q_loss_f = np.loadtxt("../RES/memory_task_loss_q_"+str(first)+".txt")
+q_acc_s  = np.loadtxt("../RES/memory_task_acc_q_"+str(second)+".txt")
+q_loss_s = np.loadtxt("../RES/memory_task_loss_q_"+str(second)+".txt")
+q_acc_t  = np.loadtxt("../RES/memory_task_acc_q_"+str(third)+".txt")
+q_loss_t = np.loadtxt("../RES/memory_task_loss_q_"+str(third)+".txt")
 
-r_acc_f  = np.loadtxt("DATA/memory_task_acc_r_"+str(first)+".txt")
-r_loss_f = np.loadtxt("DATA/memory_task_loss_r_"+str(first)+".txt")
-r_acc_s  = np.loadtxt("DATA/memory_task_acc_r_"+str(second)+".txt")
-r_loss_s = np.loadtxt("DATA/memory_task_loss_r_"+str(second)+".txt")
-r_acc_t  = np.loadtxt("DATA/memory_task_acc_r_"+str(third)+".txt")
-r_loss_t = np.loadtxt("DATA/memory_task_loss_r_"+str(third)+".txt")
+r_acc_f  = np.loadtxt("../RES/memory_task_acc_r_"+str(first)+".txt")
+r_loss_f = np.loadtxt("../RES/memory_task_loss_r_"+str(first)+".txt")
+r_acc_s  = np.loadtxt("../RES/memory_task_acc_r_"+str(second)+".txt")
+r_loss_s = np.loadtxt("../RES/memory_task_loss_r_"+str(second)+".txt")
+r_acc_t  = np.loadtxt("../RES/memory_task_acc_r_"+str(third)+".txt")
+r_loss_t = np.loadtxt("../RES/memory_task_loss_r_"+str(third)+".txt")
 
 
 q_acc_f = q_acc_f[:] * 100
@@ -84,4 +84,4 @@ plt.setp([a.get_xticklabels() for a in axarr[0, :]], visible=False)
 plt.setp([a.get_yticklabels() for a in axarr[:, 2]], visible=False)
 plt.setp([a.get_yticklabels() for a in axarr[:, 1]], visible=False)
 
-plt.savefig('RES/curves.png', format='png', dpi=1200)
+plt.savefig('../RES/curves.png', format='png', dpi=1200)
