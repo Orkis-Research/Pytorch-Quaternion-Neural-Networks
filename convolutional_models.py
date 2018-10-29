@@ -43,8 +43,8 @@ class QCAE(nn.Module):
         e1  = self.act(self.e1(x))
         e2  = self.act(self.e2(e1))
 
-        d1  = self.act(self.d5(e2))
-        d2  = self.d6(d1)
+        d1  = self.act(self.d1(e2))
+        d2  = self.d2(d1)
         
         out = self.output_act(d2)
 
