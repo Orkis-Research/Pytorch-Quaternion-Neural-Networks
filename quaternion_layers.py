@@ -15,7 +15,6 @@ import torch.nn              as nn
 from torch.nn.parameter      import Parameter
 from torch.nn.utils.rnn      import PackedSequence
 from torch.nn                import Module
-from torch.nn._functions.rnn import Recurrent, variable_recurrent_factory
 from quaternion_ops          import *
 import math
 import sys
@@ -25,27 +24,29 @@ class QuaternionTransposeConv(Module):
     """
 
     def __init__(self, in_channels, out_channels, kernel_size, stride,
-                 dilatation=1, padding=0, output_padding=0, groups=1, bias=True, init_criterion='glorot',
-                 weight_init='quaternion', seed=None, operation='convolution2d', rotation=False):
+                 dilatation=1, padding=0, output_padding=0, groups=1, bias=True, init_criterion='he',
+                 weight_init='unitary', seed=None, operation='convolution2d', rotation=False, 
+                 quaternion_format=False):
 
         super(QuaternionTransposeConv, self).__init__()
 
-        self.in_channels     =    in_channels  // 4
-        self.out_channels    =    out_channels // 4
-        self.stride          =    stride
-        self.padding         =    padding
-        self.output_padding  =    output_padding
-        self.groups          =    groups
-        self.dilatation      =    dilatation
-        self.init_criterion  =    init_criterion
-        self.weight_init     =    weight_init
-        self.seed            =    seed if seed is not None else 1234
-        self.rng             =    RandomState(self.seed)
-        self.operation       = operation
-        self.rotation        = rotation
-        self.winit           =    {'quaternion': quaternion_init,
-                                   'unitary'   : unitary_init,
-                                   'random'    : random_init}[self.weight_init]
+        self.in_channels       = in_channels  // 4
+        self.out_channels      = out_channels // 4
+        self.stride            = stride
+        self.padding           = padding
+        self.output_padding    = output_padding
+        self.groups            = groups
+        self.dilatation        = dilatation
+        self.init_criterion    = init_criterion
+        self.weight_init       = weight_init
+        self.seed              = seed if seed is not None else np.random.randint(0,1234)
+        self.rng               = RandomState(self.seed)
+        self.operation         = operation
+        self.rotation          = rotation
+        self.quaternion_format = quaternion_format
+        self.winit             = {'quaternion': quaternion_init,
+                                  'unitary'   : unitary_init,
+                                  'random'    : random_init}[self.weight_init]
 
         
         (self.kernel_size, self.w_shape) = get_kernel_and_weight_shape( self.operation, 
@@ -74,7 +75,7 @@ class QuaternionTransposeConv(Module):
         if self.rotation:
             return quaternion_tranpose_conv_rotation(input, self.r_weight, self.i_weight, 
                 self.j_weight, self.k_weight, self.bias, self.stride, self.padding, 
-                self.output_padding, self.groups, self.dilatation)
+                self.output_padding, self.groups, self.dilatation, self.quaternion_format)
         else:
             return quaternion_transpose_conv(input, self.r_weight, self.i_weight, self.j_weight, 
                 self.k_weight, self.bias, self.stride, self.padding, self.output_padding, 
@@ -100,26 +101,27 @@ class QuaternionConv(Module):
     """
 
     def __init__(self, in_channels, out_channels, kernel_size, stride,
-                 dilatation=1, padding=0, groups=1, bias=True, init_criterion='glorot',
-                 weight_init='quaternion', seed=None, operation='convolution2d', rotation=False):
+                 dilatation=1, padding=0, groups=1, bias=True, init_criterion='he',
+                 weight_init='unitary', seed=None, operation='convolution2d', rotation=False, quaternion_format=False):
 
         super(QuaternionConv, self).__init__()
 
-        self.in_channels     =    in_channels  // 4
-        self.out_channels    =    out_channels // 4
-        self.stride          =    stride
-        self.padding         =    padding
-        self.groups          =    groups
-        self.dilatation      =    dilatation
-        self.init_criterion  =    init_criterion
-        self.weight_init     =    weight_init
-        self.seed            =    seed if seed is not None else 1234
-        self.rng             =    RandomState(self.seed)
-        self.operation       = operation
-        self.rotation = rotation
-        self.winit           =    {'quaternion': quaternion_init,
-                                   'unitary'   : unitary_init,
-                                   'random'    : random_init}[self.weight_init]
+        self.in_channels       = in_channels  // 4
+        self.out_channels      = out_channels // 4
+        self.stride            = stride
+        self.padding           = padding
+        self.groups            = groups
+        self.dilatation        = dilatation
+        self.init_criterion    = init_criterion
+        self.weight_init       = weight_init
+        self.seed              = seed if seed is not None else np.random.randint(0,1234)
+        self.rng               = RandomState(self.seed)
+        self.operation         = operation
+        self.rotation          = rotation
+        self.quaternion_format = quaternion_format
+        self.winit             =    {'quaternion': quaternion_init,
+                                     'unitary'   : unitary_init,
+                                     'random'    : random_init}[self.weight_init]
 
         
         (self.kernel_size, self.w_shape) = get_kernel_and_weight_shape( self.operation, 
@@ -146,7 +148,8 @@ class QuaternionConv(Module):
 
         if self.rotation:
             return quaternion_conv_rotation(input, self.r_weight, self.i_weight, self.j_weight, 
-                self.k_weight, self.bias, self.stride, self.padding, selfn.groups, self.dilatation)
+                self.k_weight, self.bias, self.stride, self.padding, selfn.groups, self.dilatation, 
+                self.quaternion_format)
         else:
             return quaternion_conv(input, self.r_weight, self.i_weight, self.j_weight, 
                 self.k_weight, self.bias, self.stride, self.padding, self.groups, self.dilatation)
@@ -174,24 +177,26 @@ class QuaternionLinearAutograd(Module):
     """
 
     def __init__(self, in_features, out_features, bias=True,
-                 init_criterion='glorot', weight_init='quaternion',
-                 seed=None, rotation=False):
+                 init_criterion='he', weight_init='unitary',
+                 seed=None, rotation=False, quaternion_format=False):
 
         super(QuaternionLinearAutograd, self).__init__()
-        self.in_features = in_features//4
-        self.out_features = out_features//4
-        self.rotation = rotation
+        self.in_features       = in_features//4
+        self.out_features      = out_features//4
+        self.rotation          = rotation
+        self.quaternion_format = quaternion_format
         self.r_weight = Parameter(torch.Tensor(self.in_features, self.out_features))
         self.i_weight = Parameter(torch.Tensor(self.in_features, self.out_features))
         self.j_weight = Parameter(torch.Tensor(self.in_features, self.out_features))
         self.k_weight = Parameter(torch.Tensor(self.in_features, self.out_features))
+
         if bias:
             self.bias = Parameter(torch.Tensor(self.out_features*4))
         else:
             self.register_parameter('bias', None)
         self.init_criterion = init_criterion
         self.weight_init = weight_init
-        self.seed = seed if seed is not None else 1337
+        self.seed = seed if seed is not None else np.random.randint(0,1234)
         self.rng = RandomState(self.seed)
         self.reset_parameters()
 
@@ -205,7 +210,7 @@ class QuaternionLinearAutograd(Module):
     def forward(self, input):
         # See the autograd section for explanation of what happens here.
         if self.rotation:
-            return quaternion_linear_rotation(input, self.r_weight, self.i_weight, self.j_weight, self.k_weight, self.bias)
+            return quaternion_linear_rotation(input, self.r_weight, self.i_weight, self.j_weight, self.k_weight, self.bias, self.quaternion_format)
         else:
             return quaternion_linear(input, self.r_weight, self.i_weight, self.j_weight, self.k_weight, self.bias)
 
@@ -223,24 +228,26 @@ class QuaternionLinear(Module):
     """
 
     def __init__(self, in_features, out_features, bias=True,
-                 init_criterion='glorot', weight_init='quaternion',
+                 init_criterion='he', weight_init='unitary',
                  seed=None):
 
         super(QuaternionLinear, self).__init__()
-        self.in_features = in_features//4
+        self.in_features  = in_features//4
         self.out_features = out_features//4
-        self.r_weight = Parameter(torch.Tensor(self.in_features, self.out_features))
-        self.i_weight = Parameter(torch.Tensor(self.in_features, self.out_features))
-        self.j_weight = Parameter(torch.Tensor(self.in_features, self.out_features))
-        self.k_weight = Parameter(torch.Tensor(self.in_features, self.out_features))
+        self.r_weight     = Parameter(torch.Tensor(self.in_features, self.out_features))
+        self.i_weight     = Parameter(torch.Tensor(self.in_features, self.out_features))
+        self.j_weight     = Parameter(torch.Tensor(self.in_features, self.out_features))
+        self.k_weight     = Parameter(torch.Tensor(self.in_features, self.out_features))
+
         if bias:
-            self.bias = Parameter(torch.Tensor(self.out_features*4))
+            self.bias     = Parameter(torch.Tensor(self.out_features*4))
         else:
             self.register_parameter('bias', None)
+        
         self.init_criterion = init_criterion
-        self.weight_init = weight_init
-        self.seed = seed if seed is not None else 1337
-        self.rng = RandomState(self.seed)
+        self.weight_init    = weight_init
+        self.seed           = seed if seed is not None else np.random.randint(0,1234)
+        self.rng            = RandomState(self.seed)
         self.reset_parameters()
 
     def reset_parameters(self):
