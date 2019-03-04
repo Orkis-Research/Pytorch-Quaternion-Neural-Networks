@@ -12,7 +12,9 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import numpy as np
 from numpy.random import RandomState
+from scipy.stats import chi
 import sys
+
 
 
 def check_input(input):
@@ -78,6 +80,30 @@ def get_modulus(input, vector_form=False):
     else:
         return torch.sqrt((r * r + i * i + j * j + k * k).sum(dim=0))
 
+def q_normalize(input, channel=-1):
+
+    if channel != -1:
+        dim   = int(input.dim()) - 1
+        input = input.transpose(dim,channel)
+
+    r = get_r(input) 
+    i = get_i(input)
+    j = get_j(input)
+    k = get_k(input)
+
+    norm = torch.sqrt(r*r + i*i + j*j + k*k + 0.00001)
+    r = r / norm
+    i = i / norm
+    j = j / norm
+    k = k / norm
+
+    input = torch.cat([r,i,j,k], dim=-1)
+
+    if channel != -1:
+        dim = int(input.dim()) - 1
+        return input.transpose(dim, channel)
+    else:
+        return input
 
 def get_normalized(input, eps=0.0001):
     check_input(input)
@@ -502,11 +528,13 @@ def unitary_init(in_features, out_features, rng, kernel_size=None, criterion='he
         else:
             kernel_shape = (out_features, in_features) + (*kernel_size,)
 
+    s = np.sqrt(3.0) * s
+
     number_of_weights = np.prod(kernel_shape) 
-    v_r = np.random.normal(0.0,s,number_of_weights)
-    v_i = np.random.normal(0.0,s,number_of_weights)
-    v_j = np.random.normal(0.0,s,number_of_weights)
-    v_k = np.random.normal(0.0,s,number_of_weights)
+    v_r = np.random.uniform(-s,s,number_of_weights)
+    v_i = np.random.uniform(-s,s,number_of_weights)
+    v_j = np.random.uniform(-s,s,number_of_weights)
+    v_k = np.random.uniform(-s,s,number_of_weights)
     
     # Unitary quaternion
     for i in range(0, number_of_weights):
@@ -515,6 +543,7 @@ def unitary_init(in_features, out_features, rng, kernel_size=None, criterion='he
         v_i[i]/= norm
         v_j[i]/= norm
         v_k[i]/= norm
+
     v_r = v_r.reshape(kernel_shape)
     v_i = v_i.reshape(kernel_shape)
     v_j = v_j.reshape(kernel_shape)
@@ -581,8 +610,10 @@ def quaternion_init(in_features, out_features, rng, kernel_size=None, criterion=
         s = 1. / np.sqrt(2*fan_in)
     else:
         raise ValueError('Invalid criterion: ' + criterion)
-    rng = RandomState(123)
     
+    rng = RandomState(np.random.randint(1,1234))
+    
+
     # Generating randoms and purely imaginary quaternions :
     if kernel_size is None:
         kernel_shape = (in_features, out_features)
@@ -592,14 +623,15 @@ def quaternion_init(in_features, out_features, rng, kernel_size=None, criterion=
         else:
             kernel_shape = (out_features, in_features) + (*kernel_size,)
 
+    modulus = chi.rvs(4,loc=0,scale=s,size=kernel_shape)
     number_of_weights = np.prod(kernel_shape) 
-    v_i = np.random.normal(0.0,s,number_of_weights)
-    v_j = np.random.normal(0.0,s,number_of_weights)
-    v_k = np.random.normal(0.0,s,number_of_weights)
+    v_i = np.random.normal(0,1.0,number_of_weights)
+    v_j = np.random.normal(0,1.0,number_of_weights)
+    v_k = np.random.normal(0,1.0,number_of_weights)
     
     # Purely imaginary quaternions unitary
     for i in range(0, number_of_weights):
-    	norm = np.sqrt(v_i[i]**2 + v_j[i]**2 + v_k[i]**2)+0.0001
+    	norm = np.sqrt(v_i[i]**2 + v_j[i]**2 + v_k[i]**2 +0.0001)
     	v_i[i]/= norm
     	v_j[i]/= norm
     	v_k[i]/= norm
@@ -607,7 +639,6 @@ def quaternion_init(in_features, out_features, rng, kernel_size=None, criterion=
     v_j = v_j.reshape(kernel_shape)
     v_k = v_k.reshape(kernel_shape)
 
-    modulus = rng.uniform(low=-s, high=s, size=kernel_shape)
     phase = rng.uniform(low=-np.pi, high=np.pi, size=kernel_shape)
 
     weight_r = modulus * np.cos(phase)
