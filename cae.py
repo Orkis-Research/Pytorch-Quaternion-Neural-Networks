@@ -10,8 +10,6 @@ import torch
 from torch                import nn
 from torch.autograd       import Variable
 from torch.utils.data     import DataLoader
-from torchvision          import transforms
-from torchvision.utils    import save_image
 from convolutional_models import CAE, QCAE
 import os
 from scipy                import misc
@@ -103,7 +101,7 @@ for epoch in range(num_epochs):
     loss.backward()
     optimizer.step()
 
-    print("It : "+str(epoch+1)+" | loss_train "+str(loss.cpu().data[0].numpy()))
+    print("It : "+str(epoch+1)+" | loss_train "+str(loss.cpu().item()))
     
     # If generation rate, generate a test image
     if (epoch %generation_rate) == 0:

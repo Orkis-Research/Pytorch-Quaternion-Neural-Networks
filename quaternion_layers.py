@@ -24,8 +24,8 @@ class QuaternionTransposeConv(Module):
     """
 
     def __init__(self, in_channels, out_channels, kernel_size, stride,
-                 dilatation=1, padding=0, output_padding=0, groups=1, bias=True, init_criterion='he',
-                 weight_init='unitary', seed=None, operation='convolution2d', rotation=False, 
+                 dilatation=1, padding=0, output_padding=0, groups=1, bias=True, init_criterion='glorot',
+                 weight_init='quaternion', seed=None, operation='convolution2d', rotation=False, 
                  quaternion_format=False):
 
         super(QuaternionTransposeConv, self).__init__()
@@ -101,8 +101,8 @@ class QuaternionConv(Module):
     """
 
     def __init__(self, in_channels, out_channels, kernel_size, stride,
-                 dilatation=1, padding=0, groups=1, bias=True, init_criterion='he',
-                 weight_init='unitary', seed=None, operation='convolution2d', rotation=False, quaternion_format=False):
+                 dilatation=1, padding=0, groups=1, bias=True, init_criterion='glorot',
+                 weight_init='quaternion', seed=None, operation='convolution2d', rotation=False, quaternion_format=False):
 
         super(QuaternionConv, self).__init__()
 
@@ -177,7 +177,7 @@ class QuaternionLinearAutograd(Module):
     """
 
     def __init__(self, in_features, out_features, bias=True,
-                 init_criterion='he', weight_init='unitary',
+                 init_criterion='glorot', weight_init='quaternion',
                  seed=None, rotation=False, quaternion_format=False):
 
         super(QuaternionLinearAutograd, self).__init__()
@@ -228,7 +228,7 @@ class QuaternionLinear(Module):
     """
 
     def __init__(self, in_features, out_features, bias=True,
-                 init_criterion='he', weight_init='unitary',
+                 init_criterion='glorot', weight_init='quaternion',
                  seed=None):
 
         super(QuaternionLinear, self).__init__()
