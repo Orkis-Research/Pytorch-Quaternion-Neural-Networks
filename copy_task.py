@@ -31,7 +31,7 @@ def getTask(N_BATCH, SEQ_LENGTH, FEAT_SIZE, BLANK_SIZE, embedding):
     for i in range(N_BATCH):
 
         # Target values of blank and delim
-        blank = FEAT_SIZE 
+        blank = np.array([FEAT_SIZE])
         delim = FEAT_SIZE + 1
 
         # Embedding
