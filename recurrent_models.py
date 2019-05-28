@@ -140,6 +140,24 @@ class QLSTM(nn.Module):
      
         return torch.cat(out,0)
 
+class StackedQLSTM(nn.Module):
+    def __init__(self, feat_size, hidden_size, use_cuda, n_layers, batch_first=True):
+        super(StackedQLSTM, self).__init__()
+        self.batch_first = batch_first
+        self.layers = nn.ModuleList([QLSTM(feat_size, hidden_size, use_cuda) for _ in range(n_layers)])
+    
+    def forward(self, x):
+        # QLSTM takes inputs of shape (seq_len, batch_size, feat_size)
+        if self.batch_first:
+            x = x.permute(1,0,2)
+        for layer in self.layers:
+            x = layer(x)
+            # Remove extra feature added by QLSTM
+            x = x[:,:,:-1]
+        if self.batch_first:
+            x = x.permute(1,0,2)
+        return x
+
 class RNN(nn.Module):
     def __init__(self, feat_size, hidden_size, CUDA):
         super(RNN, self).__init__()
