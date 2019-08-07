@@ -1,5 +1,5 @@
 ##########################################################
-# pytorch-qnn v1.0                                     
+# pytorch-qnn v1.0
 # Titouan Parcollet
 # LIA, Université d'Avignon et des Pays du Vaucluse
 # ORKIS, Aix-en-provence
@@ -17,7 +17,7 @@ import numpy               as np
 from   recurrent_models    import QRNN, RNN, LSTM, QLSTM
 
 #
-# Convert to torch.Variable 
+# Convert to torch.Variable
 #
 def tovar(x, cuda):
     if cuda:
@@ -30,11 +30,11 @@ def getTask(N_BATCH, SEQ_LENGTH, FEAT_SIZE, BLANK_SIZE, embedding):
     lab    = []
     seq    = []
     target = []
-    
+
     for i in range(N_BATCH):
 
         # Target values of blank and delim
-        blank = FEAT_SIZE 
+        blank = FEAT_SIZE
         delim = FEAT_SIZE + 1
 
         # Embedding
@@ -54,7 +54,7 @@ def getTask(N_BATCH, SEQ_LENGTH, FEAT_SIZE, BLANK_SIZE, embedding):
             random_index_list.append(random)
 
             seq.append(feat)
-            target.append(blank)        
+            target.append(blank)
 
         # BLANK
         for j in range(BLANK_SIZE - 1):
@@ -62,14 +62,14 @@ def getTask(N_BATCH, SEQ_LENGTH, FEAT_SIZE, BLANK_SIZE, embedding):
             target.append(blank)
 
         # Append a last blank to target for delimiter in input
-        target.append(blank)  
+        target.append(blank)
 
         # DELIMITER
         seq.append(delim_emb)
 
         # Append input to target
         for j in random_index_list:
-            
+
             target.append(j)
             seq.append(delim_emb)
 
@@ -80,6 +80,9 @@ def getTask(N_BATCH, SEQ_LENGTH, FEAT_SIZE, BLANK_SIZE, embedding):
         target = []
 
     return np.array(data), np.array(lab)
+
+if not os.path.isdir('out'):
+    os.system('mkdir out')
 
 #
 # DEFINING THE TASK
@@ -133,7 +136,7 @@ break_q = False
 for epoch in range(EPOCHS):
 
     #
-    # The input sequence size is 2 times the sequence length + number_of_blank - 1 + 1 
+    # The input sequence size is 2 times the sequence length + number_of_blank - 1 + 1
     # (+ 1 for the delimiter). We generate N_BATCH_TRAIN new sequences each epoch
     #
     train, train_target = getTask(N_BATCH_TRAIN,SEQ_LENGTH, FEAT_SIZE, BLANK_SIZE, emb)
@@ -143,7 +146,7 @@ for epoch in range(EPOCHS):
 
     train_var        = tovar(train, CUDA)
     train_target_var = tovar(train_target, CUDA)
-    
+
     # NN Training
     net_r.zero_grad()
     p = net_r.forward(train_var)
@@ -158,7 +161,7 @@ for epoch in range(EPOCHS):
 
     val_loss.backward()
     net_r.adam.step()
-    
+
     # Train ACC and LOSS
     p       = p.cpu().data.numpy()
     shape   = np.argmax(p, axis=2).shape
@@ -166,7 +169,7 @@ for epoch in range(EPOCHS):
     targets = targets.cpu().data.numpy()
     acc     = np.sum( p == targets) / (train_target.size)
 
-    
+
     if (epoch % 5) == 0:
         accs_r.append(acc)
         losses_r.append(float(val_loss.data))
@@ -190,7 +193,7 @@ for epoch in range(EPOCHS):
     p       = np.reshape(np.argmax(p, axis=2), shape[0]*shape[1])
     targets = targets.cpu().data.numpy()
     acc     = np.sum( p == targets) / (train_target.size)
-    
+
     if (epoch % 5) == 0:
         losses_q.append(float(val_loss.data))
         accs_q.append(acc)

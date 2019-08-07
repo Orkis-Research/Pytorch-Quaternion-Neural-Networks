@@ -81,6 +81,9 @@ def getTask(N_BATCH, SEQ_LENGTH, FEAT_SIZE, BLANK_SIZE, embedding):
 
     return np.array(data), np.array(lab)
 
+if not os.path.isdir('out'):
+    os.system('mkdir out')
+
 #
 # DEFINING THE TASK
 #
