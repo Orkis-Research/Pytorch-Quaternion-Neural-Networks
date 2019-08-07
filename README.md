@@ -5,7 +5,7 @@ This repository offers up-to-date PyTorch implementations of various quaternion 
 Requirements
 ------------
 1. A GPU with a running CUDA installation is preferable. Please be certain that CUDA is correctly configured if you plan to use GPUs.
-2. Install PyTorch depending on your environment: [PyTorch]https://pytorch.org/get-started/locally/
+2. Install PyTorch depending on your environment: [PyTorch](https://pytorch.org/get-started/locally/)
 3. Install others needed packages:
 
 ```bash
@@ -20,7 +20,7 @@ pip install .
 Usage
 ------------
 
-Please navigate through the exp directory. Different running examples are proposed based on published papers. If you use this code or part of it, please cite the following paper:
+Please navigate through the *exp* directory. Different running examples are proposed based on published papers. If you use this code or part of it, please cite the following paper:
 
 *Titouan Parcollet, Mirco Ravanelli, Mohamed Morchid, Georges Linarès, Chiheb Trabelsi, Renato De Mori, Yoshua Bengio - "Quaternion Recurrent Neural Networks", [OpenReview](https://openreview.net/forum?id=ByMHvs0cFQ)*
 
