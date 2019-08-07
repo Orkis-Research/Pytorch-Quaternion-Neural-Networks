@@ -1,15 +1,15 @@
 # PyTorch-Quaternion-Neural-Networks
 
-This repository offers p-to-date PyTorch implementations of various quaternion neural networks (QNN), such as QRNN, QLSTM, QCNN, or QCAE. Core components are situated within the core_qnn package, and can be reused to create custom QNN, based on easy to customize PyTorch modules like QuaternionLinear, QuaternionConv, or QuaternionTransposeConv.
+This repository offers up-to-date PyTorch implementations of various quaternion neural networks (QNN), such as QRNNs, QLSTMs, QCNNs, or QCAEs. Core components are situated within the core_qnn package, and can be reused to create custom QNNs, based on easy to customize PyTorch modules like QuaternionLinear, QuaternionConv, or QuaternionTransposeConv.
 
 Requirements
 ------------
 1. A GPU with a running CUDA installation is preferable. Please be certain that CUDA is correctly configured if you plan to use GPUs.
-2. Install pytorch depending on your environment: https://pytorch.org/get-started/locally/
+2. Install PyTorch depending on your environment: [PyTorch]https://pytorch.org/get-started/locally/
 3. Install others needed packages:
 
 ```bash
-pip install imagio numpy scipy     
+pip install imageio numpy scipy     
 ```
 
 4. Finally, install our core_qnn package:
