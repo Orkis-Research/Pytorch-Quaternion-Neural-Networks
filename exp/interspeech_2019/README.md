@@ -1,4 +1,4 @@
-# ICASSP 2019
+# Interspeech 2019
 
 This directory contains source codes and examples of quaternion neural networks investigated for the Interspeech 2019 conference.
 
