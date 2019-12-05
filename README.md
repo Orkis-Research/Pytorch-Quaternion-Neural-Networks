@@ -5,11 +5,11 @@ This repository offers up-to-date PyTorch implementations of various quaternion 
 Requirements
 ------------
 1. A GPU with a running CUDA installation is preferable. Please be certain that CUDA is correctly configured if you plan to use GPUs.
-2. Install PyTorch depending on your environment: [PyTorch](https://pytorch.org/get-started/locally/)
+2. Install PyTorch and torchvision depending on your environment: [PyTorch](https://pytorch.org/get-started/locally/)
 3. Install others needed packages:
 
 ```bash
-pip install imageio numpy scipy     
+pip install imageio numpy scipy    
 ```
 
 4. Finally, install our core_qnn package:
