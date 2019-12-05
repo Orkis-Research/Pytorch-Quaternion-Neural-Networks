@@ -54,8 +54,8 @@ class R2HQDNN(nn.Module):
         if self.proj_norm:
             x = q_normalize(x)
 
-        x = nn.ReLU()(self.fc1(x))
-        x = nn.ReLU()(self.fc2(x))
-        x = nn.ReLU()(self.fc3(x))
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
 
         return self.out(x)
